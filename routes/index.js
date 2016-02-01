@@ -5,6 +5,8 @@ var bing = require('node-bing-api')({ accKey: apikey });
 var bodyParser = require('body-parser');
 var parseUrlencoded = bodyParser.urlencoded({ extended: false });
 
+var history = [];
+
 module.exports = function(app) {
 
 	app.route('/')
@@ -37,13 +39,25 @@ module.exports = function(app) {
               }, function(error, response, body){
                   body.d.results[0].Image.forEach(pushArrayElements);
                   res.json(resultArr);
+                });
+            // push the search to history
+            history.push({
+                term: search,
+                when: new Date()
             });
+            if (history.length > 10) {
+                history.shift();
+            }
 	    });
 	    
-        app.route('/search_form')
+    app.route('/search_form')
         .post(parseUrlencoded, function(request, response){  
             var searchQuery = request.body.query;
             response.redirect('/imagesearch/' + searchQuery);
         });
-
+        
+    app.route('/latest')
+        .get(function (req, res) {
+            res.json(history);
+        });
 };
