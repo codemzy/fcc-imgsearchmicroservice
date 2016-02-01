@@ -41,12 +41,12 @@ module.exports = function(app) {
                   res.json(resultArr);
                 });
             // push the search to history
-            history.push({
+            history.unshift({
                 term: search,
                 when: new Date()
             });
             if (history.length > 10) {
-                history.shift();
+                history.pop();
             }
 	    });
 	    
